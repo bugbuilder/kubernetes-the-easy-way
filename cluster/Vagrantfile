@@ -1,0 +1,45 @@
+M_RAM   = 2048
+W_RAM   = 1024
+
+IP= "10.240.0."
+NETMASK = "255.255.255.0"
+
+BOX     = "ubuntu/bionic64"
+VERSION = "20190126.0.0"
+
+$controller_count = 3
+$worker_count = 3
+
+Vagrant.configure(2) do |config|
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.box = BOX
+  config.vm.box_version = VERSION
+
+  config.vm.provider "virtualbox" do |vbox|
+    vbox.gui = false
+    vbox.cpus = 1
+  end
+
+  (1..$controller_count).each do |i|
+    config.vm.define vm_name ="controller-%d" %i do |node|
+      node.vm.hostname = vm_name
+      node.vm.network 'private_network', ip: IP+"#{i+10}", netmask: NETMASK, virtualbox__intnet: true
+
+      node.vm.provider "virtualbox" do |vbox|
+        vbox.memory = M_RAM
+      end
+    end
+  end
+
+  (1..$worker_count).each do |i|
+    config.vm.define vm_name ="worker-%d" %i do |node|
+      node.vm.hostname = vm_name
+      node.vm.network 'private_network', ip: IP+"#{i+20}", netmask: NETMASK, virtualbox__intnet: true
+
+      node.vm.provider "virtualbox" do |vbox|
+        vbox.memory = W_RAM
+      end
+    end
+  end
+end
