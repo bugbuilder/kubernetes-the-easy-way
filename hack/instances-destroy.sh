@@ -7,4 +7,5 @@ set -o pipefail
 SCRIPT_PATH=$(dirname "$(readlink -f "$BASH_SOURCE")")
 
 cd $SCRIPT_PATH/../cluster
+rm *.log
 vagrant destroy -f
